@@ -70,5 +70,17 @@ node{
                }"""
                server.download(downloadSpec)
                }
+	stage('Deploy to Production'){
+		      sh 'ansible-playbook /opt/ansible/copywarfile.yml'
+	}
+	stage('Email Notification'){
+               mail bcc: '', body: 'Welcome to jenkins notification alert', 
+               cc: 'mohamed.sadiqh@gmail.com', from: '', replyTo: '', subject: 'Jenkins job', to: 'vasucena145@gmail.com'
+            }
+        stage('Attachment Log'){
+                 emailext attachLog: true, body: '${currentBuild.result}: ${BUILD_URL}', 
+                 compressLog: true, replyTo: 'mohamed.sadiqh@gmail.com', 
+                 subject: 'Build Notification: ${JOB_NAME}-Build# ${BUILD_NUMBER} ${currentBuild.result}', to: 'vasucena145@gmail.com'
+            } 
 }
 
