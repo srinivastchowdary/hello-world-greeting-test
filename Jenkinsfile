@@ -45,7 +45,7 @@ node{
   	}
         stage ('Promote build in Artifactory'){
     		withCredentials([usernameColonPassword(credentialsId: 'artifactory-account', variable: 'credentials')]) {
-    			sh 'curl -u${credentials} -X PUT "http://34.203.41.207:8081/Esafe-Project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
+    			sh 'curl -u${credentials} -X PUT "http://34.203.41.207:8081/artifactory/Esafe-Project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
 		}
 	}
 	stage('Deploy to ansiblesaerver'){
