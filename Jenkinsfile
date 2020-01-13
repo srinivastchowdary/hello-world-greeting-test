@@ -45,8 +45,22 @@ node{
   	}
         stage ('Promote build in Artifactory'){
     		withCredentials([usernameColonPassword(credentialsId: 'artifactory-account', variable: 'credentials')]) {
-    			sh 'curl -u${credentials} -X PUT "http://34.203.41.207:8081/artifactory/api/storage/Esafe-Project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
+    			sh 'curl -u${credentials} -X PUT "http://34.203.41.207:8081/Esafe-Project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
 		}
 	}
+	stage('Deploy to ansiblesaerver'){
+             def server = Artifactory.server 'Default Artifactory Server'
+             def downloadSpec = """{
+             "files": [
+              {
+              "pattern": "Esafe-Project/$BUILD_NUMBER/*.war",
+              "target": "/opt/ansible/",
+              "props": "Performance-Tested=Yes;Integration-Tested=Yes",
+              "flat": "true"
+               }
+               ]
+               }"""
+               server.download(downloadSpec)
+               }
 }
 
