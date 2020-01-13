@@ -15,8 +15,22 @@ node{
 		junit '**/target/failsafe-reports/TEST-*.xml'
       		archive 'target/*.war'
 	}
+	stage ('Publish'){
+    		def server = Artifactory.server 'Default Artifactory Server'
+    		def uploadSpec = """{
+    		"files": [
+    		{
+     		"pattern": "target/Esafe-0.0.1.war",
+     		"target": "Esafe-Project/${BUILD_NUMBER}/",
+	 	"props": "Integration-Tested=Yes;Performance-Tested=No"
+   		}
+           	]
+		}"""
+		server.upload(uploadSpec)
+	}
+	stash includes: 'target/Esafe-0.0.1.war,src/pt/Hello_World_Test_Plan.jmx', name: 'binary'
 	
- stage ('Start Tomcat'){
+       stage ('Start Tomcat'){
     		sh label: '', script: '''cd /home/ubuntu/tomcat/bin
     		./startup.sh''';
   	}
@@ -42,7 +56,7 @@ node{
 		}"""
 		server.upload(uploadSpec)
 	}
-	stage('Deploy to ansiblesaerver'){
+	stage('Download Artifacts to Ansible Server'){
              def server = Artifactory.server 'Default Artifactory Server'
              def downloadSpec = """{
              "files": [
