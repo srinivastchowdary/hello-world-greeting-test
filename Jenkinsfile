@@ -31,12 +31,12 @@ node{
 	stash includes: 'target/Esafe-0.0.1.war,src/pt/Hello_World_Test_Plan.jmx', name: 'binary'
 
  stage ('Start Tomcat'){
-    		sh label: '', script: '''cd /home/jenkins/tomcat/bin
+    		sh label: '', script: '''cd /home/ubuntu/tomcat/bin
     		./startup.sh''';
   	}
   	stage ('Deploy '){
     		unstash 'binary'
-    		sh 'cp target/Esafe-0.0.1.war /home/jenkins/tomcat/webapps/';
+    		sh 'cp target/Esafe-0.0.1.war /home/ubuntu/tomcat/webapps/';
   	}
   	stage ('Performance Testing'){
     		sh '''cd /opt/jmeter/bin/
@@ -45,7 +45,7 @@ node{
   	}
         stage ('Promote build in Artifactory'){
     		withCredentials([usernameColonPassword(credentialsId: 'artifactory-account', variable: 'credentials')]) {
-    			sh 'curl -u${credentials} -X PUT "http://192.168.0.203:8081/artifactory/api/storage/kubernetes-project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
+    			sh 'curl -u${credentials} -X PUT "http://34.203.41.207:8081/artifactory/api/storage/Esafe-Project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
 		}
 	}
 }
