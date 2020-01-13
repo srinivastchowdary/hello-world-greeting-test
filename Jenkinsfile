@@ -30,5 +30,3 @@ node('docker') {
 	}
 	stash includes: 'target/Esafe-0.0.1.war,src/pt/Hello_World_Test_Plan.jmx', name: 'binary'
 }
-
- }
