@@ -15,21 +15,7 @@ node{
 		junit '**/target/failsafe-reports/TEST-*.xml'
       		archive 'target/*.war'
 	}
-	stage ('Publish'){
-    		def server = Artifactory.server 'Default Artifactory Server'
-    		def uploadSpec = """{
-    		"files": [
-    		{
-     		"pattern": "target/Esafe-0.0.1.war",
-     		"target": "Esafe-Project/${BUILD_NUMBER}/",
-	 	"props": "Integration-Tested=Yes;Performance-Tested=No"
-   		}
-           	]
-		}"""
-		server.upload(uploadSpec)
-	}
-	stash includes: 'target/Esafe-0.0.1.war,src/pt/Hello_World_Test_Plan.jmx', name: 'binary'
-
+	
  stage ('Start Tomcat'){
     		sh label: '', script: '''cd /home/ubuntu/tomcat/bin
     		./startup.sh''';
@@ -44,9 +30,17 @@ node{
   		step([$class: 'ArtifactArchiver', artifacts: '**/*.jtl'])
   	}
         stage ('Promote build in Artifactory'){
-    		withCredentials([usernameColonPassword(credentialsId: 'artifactory-account', variable: 'credentials')]) {
-    			sh 'curl -u${credentials} -X PUT "http://34.203.41.207:8081/artifactory/Esafe-Project/${BUILD_NUMBER}/Esafe-0.0.1.war?properties=Performance-Tested=Yes"';
-		}
+    		def server = Artifactory.server 'Default Artifactory Server'
+    		def uploadSpec = """{
+    		"files": [
+    		{
+     		"pattern": "target/Esafe-0.0.1.war",
+     		"target": "Esafe-Project/${BUILD_NUMBER}/",
+	 	"props": "Integration-Tested=Yes;Performance-Tested=Yes"
+   		}
+           	]
+		}"""
+		server.upload(uploadSpec)
 	}
 	stage('Deploy to ansiblesaerver'){
              def server = Artifactory.server 'Default Artifactory Server'
